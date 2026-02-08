@@ -1,0 +1,12 @@
+sort data,Organize files in a folder by type
+file clr,Delete files older than given days
+chthress,Change fuzzy match threshold
+cls,Clear the screen
+sysinfo,Show system information
+dittocpy,Find duplicate files in a directory
+diskinfo,Show disk usage of a path
+tree,Display directory tree of a folder or drive
+open,Open a website in browser or launch a system application
+transfer,Transfer files or folders from one location to another
+view file,View file contents 
+help,Show all available commands
