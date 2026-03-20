@@ -16,7 +16,6 @@ import pandas as pd
 
 console = Console()
 
-# --- SAFE INPUT (returns default "" when stdin is lost) ---
 _orig_input = input
 
 
@@ -24,18 +23,15 @@ def _safe_input(prompt=""):
     try:
         return _orig_input(prompt)
     except (RuntimeError, EOFError):
-        # lost sys.stdin (e.g. PyInstaller onefile double-click). Return empty string so code can handle non-interactive mode.
         return ""
 
 
-# Monkeypatch console.input so existing code that calls console.input uses the safe wrapper
 console.input = _safe_input
 
 
 def open_target(target):
     target = target.strip()
 
-    # 🌐 Website
     if target.startswith(("http://", "https://", "www.")):
         if target.startswith("www."):
             target = "https://" + target
@@ -43,7 +39,6 @@ def open_target(target):
         print("🌐 Website opened")
         return
 
-    # 🖥️ Application (Windows)
     try:
         subprocess.Popen(target, shell=True)
         print("🖥️ Application opened")
@@ -51,7 +46,6 @@ def open_target(target):
     except Exception:
         print("❌ Cannot open app or site")
 
-    # Case 3: Try via PATH (cmd apps)
     try:
         subprocess.Popen(target, shell=True)
         print("🖥️ Application opened")
@@ -62,11 +56,9 @@ def open_target(target):
     print("❌ Not a valid website or application")
 
 
-# ---------------- FILE ORGANIZER ----------------
 console = Console()
 
 
-# NEW: resolve bundled data path (works in normal run and PyInstaller onefile)
 def resource_path(rel_path):
     if getattr(sys, "frozen", False):
         base = getattr(sys, "_MEIPASS", os.path.dirname(__file__))
@@ -75,7 +67,6 @@ def resource_path(rel_path):
     return os.path.join(base, rel_path)
 
 
-# --- PATH NORMALIZATION (handles quoted paths, ~, and whitespace) ---
 def normalize_path(user_input):
     """
     Normalize user input path:
@@ -87,27 +78,22 @@ def normalize_path(user_input):
     if not user_input:
         return ""
 
-    # Remove surrounding quotes
     path = user_input.strip()
     if (path.startswith('"') and path.endswith('"')) or (
         path.startswith("'") and path.endswith("'")
     ):
         path = path[1:-1]
 
-    # Strip whitespace again
     path = path.strip()
 
-    # Expand ~ to home directory
     path = os.path.expanduser(path)
 
-    # Convert to absolute path
     path = os.path.abspath(path)
 
     return path
 
 
 def read1():
-    # dat.csv has no header; use names for tabulate
     head = ["COMMANDS", "DESCRIPTION"]
     try:
         df = pd.read_csv(resource_path("dat.csv"), header=None, names=head)
@@ -681,11 +667,9 @@ def info(speed=0.04, style="bright_cyan", skip_animation=False):
     console.clear()
     console.print("[bold green]📜 TOOL INFORMATION[/bold green]\n", justify="center")
 
-    # use relative name; _animate_from_file will resolve via resource_path
     _animate_from_file(
         file_path="logic.txt", delay=speed, style=style, skip=skip_animation
     )
 
     console.print("\n[dim]Press Enter to continue...[/dim]")
-    # use safe console.input (returns "" if stdin not available) so exe doesn't crash
     console.input("")
